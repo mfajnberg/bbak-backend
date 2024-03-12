@@ -1,13 +1,14 @@
 package de.mfberg.bbak.model.creature;
 
+import de.mfberg.bbak.model.Party;
 import de.mfberg.bbak.model.item.ItemBase;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@Entity
 public class CreatureBase {
     @Id
     @GeneratedValue
@@ -16,18 +17,19 @@ public class CreatureBase {
     private String name;
     private String description;
 
-    private Integer intellect;
-    private Integer discipline;
-    private Integer power;
-    private Integer agility;
-    private Integer lucidity;
-    private Integer charisma;
+    private Long intellect;
+    private Long discipline;
+    private Long power;
+    private Long agility;
+    private Long lucidity;
+    private Long charisma;
 
-    private Integer alignment;
-    private Integer temperament;
-    private Integer morale;
+    private Long alignment;
+    private Long temperament;
+    private Long morale;
 
+    @ManyToOne
     private Party party;
-
+    @OneToMany(mappedBy = "owner")
     private List<ItemBase> backpack;
 }

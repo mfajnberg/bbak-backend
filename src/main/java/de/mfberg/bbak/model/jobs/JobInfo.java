@@ -1,4 +1,4 @@
-package de.mfberg.bbak.jobs;
+package de.mfberg.bbak.model.jobs;
 
 import lombok.*;
 

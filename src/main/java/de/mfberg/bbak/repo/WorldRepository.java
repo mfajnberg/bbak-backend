@@ -8,5 +8,4 @@ import java.util.Optional;
 
 public interface WorldRepository extends JpaRepository<HexTile, HexVector> {
     Optional<HexTile> findByAxial(HexVector coordinates);
-
 }

@@ -1,6 +1,6 @@
 package de.mfberg.bbak.services;
 
-import de.mfberg.bbak.jobs.JobInfo;
+import de.mfberg.bbak.model.jobs.JobInfo;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.AllArgsConstructor;

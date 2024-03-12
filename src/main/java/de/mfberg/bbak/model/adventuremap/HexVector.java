@@ -14,6 +14,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Embeddable
 public class HexVector implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Long q;
     private Long r;
 }

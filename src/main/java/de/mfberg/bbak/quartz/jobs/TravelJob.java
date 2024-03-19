@@ -1,6 +1,6 @@
-package de.mfberg.bbak.model.jobs;
+package de.mfberg.bbak.quartz.jobs;
 
-import de.mfberg.bbak.ApplicationContextProvider;
+import de.mfberg.bbak.quartz.ApplicationContextProvider;
 import de.mfberg.bbak.repo.PartyRepository;
 import lombok.Builder;
 import org.quartz.Job;
@@ -22,7 +22,7 @@ public class TravelJob implements Job {
         PartyRepository partyRepository = applicationContext.getBean(PartyRepository.class);
 
         JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
-        JobInfo jobInfo = (JobInfo) jobDataMap.get(TravelJob.class.getSimpleName());
-        LOG.info("~~~> traveling......." + jobInfo.getCallbackData());
+        TravelJobInfo travelJobInfo = (TravelJobInfo) jobDataMap.get(TravelJob.class.getSimpleName());
+        LOG.info("~~~> traveling......." + travelJobInfo.getCallbackData());
     }
 }

@@ -1,10 +1,13 @@
 package de.mfberg.bbak.services.authentication;
 
+import de.mfberg.bbak.quartz.SchedulerService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import static java.lang.Long.parseLong;
 
 @Service
 public class JwtService {
+    private static final Logger LOG = LoggerFactory.getLogger(JwtService.class);
 
     @Value("${application.security.jwt.secret-key}")
     private String secretKey;
@@ -44,9 +48,6 @@ public class JwtService {
             Map<String, Object> extraClaims,
             UserDetails userDetails
     ) {
-        System.out.println();
-        System.out.println(accessExpiration);
-        System.out.println();
         return buildToken(extraClaims, userDetails, accessExpiration);
     }
 

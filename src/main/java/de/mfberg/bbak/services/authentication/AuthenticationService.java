@@ -1,6 +1,5 @@
 package de.mfberg.bbak.services.authentication;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.mfberg.bbak.model.user.*;
 import de.mfberg.bbak.dto.AuthenticationRequest;
 import de.mfberg.bbak.dto.AuthenticationResponse;
@@ -8,19 +7,17 @@ import de.mfberg.bbak.dto.RegisterRequest;
 import de.mfberg.bbak.repo.TokenRepository;
 import de.mfberg.bbak.repo.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class AuthenticationService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
@@ -29,8 +26,6 @@ public class AuthService {
 
     public AuthenticationResponse register(RegisterRequest request) {
         var user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
@@ -46,7 +41,7 @@ public class AuthService {
                 .build();
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public AuthenticationResponse login(AuthenticationRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -54,7 +49,7 @@ public class AuthService {
                 )
         );
         var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(); // todo: handle proper ex
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email"));
         var accessToken = jwtService.generateAccessToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
@@ -88,38 +83,45 @@ public class AuthService {
         tokenRepository.save(token);
     }
 
-    public void refreshToken(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws IOException {
+    public AuthenticationResponse refreshToken(
+            HttpServletRequest request
+    ) {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String refreshToken;
         final String userEmail;
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return;
+            return null;
         }
         refreshToken = authHeader.substring(7);
         userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
             var user = this.userRepository.findByEmail(userEmail)
                     .orElseThrow();
-            var isTokenValidInDatabase = tokenRepository.findByToken(refreshToken)
-                    .map (t -> !t.isExpired() && !t.isRevoked())
+            var isAvailableInDB = tokenRepository.findByToken(refreshToken)
+                    .map (t ->
+                            (t.getTokenType() == TokenType.REFRESH) &&
+                            !t.isExpired() &&
+                            !t.isRevoked()
+                    )
                     .orElse(false);
-            if (jwtService.isTokenValid(refreshToken, user) && isTokenValidInDatabase) {
+            if (jwtService.isTokenValid(refreshToken, user) && isAvailableInDB) {
                 var accessToken = jwtService.generateAccessToken(user);
                 revokeAllUserTokens(user);
                 saveUserToken(user, accessToken, TokenType.ACCESS);
                 saveUserToken(user, refreshToken, TokenType.REFRESH);
-                var authResponse = AuthenticationResponse.builder()
+                return AuthenticationResponse.builder()
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
                         .build();
-                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
             else {
                 revokeAllUserTokens(user);
             }
         }
+        return null;
+    }
+
+    public boolean isUserRegistered(RegisterRequest request) {
+        return userRepository.findByEmail(request.getEmail()).isPresent();
     }
 }

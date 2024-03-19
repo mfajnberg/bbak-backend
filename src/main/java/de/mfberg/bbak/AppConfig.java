@@ -1,4 +1,4 @@
-package de.mfberg.bbak.config;
+package de.mfberg.bbak;
 
 import de.mfberg.bbak.repo.UserRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package de.mfberg.bbak;
+package de.mfberg.bbak.quartz;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

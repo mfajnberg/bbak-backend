@@ -1,6 +1,6 @@
-package de.mfberg.bbak.services;
+package de.mfberg.bbak.quartz;
 
-import de.mfberg.bbak.model.jobs.JobInfo;
+import de.mfberg.bbak.quartz.jobs.TravelJobInfo;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.AllArgsConstructor;
@@ -22,24 +22,24 @@ public class SchedulerService {
     private static final Logger LOG = LoggerFactory.getLogger(SchedulerService.class);
     private final Scheduler scheduler;
 
-    public void schedule(final Class jobClass, final JobInfo jobInfo) {
+    public void schedule(final Class jobClass, final TravelJobInfo travelJobInfo) {
         try {
             scheduler.scheduleJob(
-                    buildJobDetail(jobClass, jobInfo),
-                    buildTrigger(jobClass, jobInfo));
+                    buildJobDetail(jobClass, travelJobInfo),
+                    buildTrigger(jobClass, travelJobInfo));
         } catch (SchedulerException e) {
             LOG.error(e.getMessage(), e);
         }
     }
 
-    public List<JobInfo> getAllRunningJobs() {
+    public List<TravelJobInfo> getAllRunningJobs() {
         try {
             return scheduler.getJobKeys(GroupMatcher.anyGroup())
                     .stream()
                     .map(jobKey -> {
                         try {
                             final JobDetail jobDetail = scheduler.getJobDetail(jobKey);
-                            return (JobInfo) jobDetail.getJobDataMap().get(jobKey.getName());
+                            return (TravelJobInfo) jobDetail.getJobDataMap().get(jobKey.getName());
                         } catch (SchedulerException e) {
                             LOG.error(e.getMessage(), e);
                             return null;
@@ -53,12 +53,12 @@ public class SchedulerService {
         }
     }
 
-    public JobInfo getRunningJob(String jobId) {
+    public TravelJobInfo getRunningJob(String jobId) {
         try {
             final JobDetail jobDetail = scheduler.getJobDetail(new JobKey(jobId));
             if (jobDetail == null)
                 return null;
-            return (JobInfo) jobDetail.getJobDataMap().get(jobId);
+            return (TravelJobInfo) jobDetail.getJobDataMap().get(jobId);
         } catch (SchedulerException e) {
             LOG.error(e.getMessage(), e);
             return null;
@@ -83,9 +83,9 @@ public class SchedulerService {
         }
     }
 
-    public static JobDetail buildJobDetail(final Class jobClass, final JobInfo jobInfo) {
+    public static JobDetail buildJobDetail(final Class jobClass, final TravelJobInfo travelJobInfo) {
         final JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.put(jobClass.getSimpleName(), jobInfo);
+        jobDataMap.put(jobClass.getSimpleName(), travelJobInfo);
 
         return JobBuilder
                 .newJob(jobClass)
@@ -94,20 +94,20 @@ public class SchedulerService {
                 .build();
     }
 
-    public static Trigger buildTrigger(final Class jobClass, final JobInfo jobInfo) {
-        SimpleScheduleBuilder builder = SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(jobInfo.getRepeatIntervalMs());
+    public static Trigger buildTrigger(final Class jobClass, final TravelJobInfo travelJobInfo) {
+        SimpleScheduleBuilder builder = SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(travelJobInfo.getRepeatIntervalMs());
 
-        if (jobInfo.isRunForever()) {
+        if (travelJobInfo.isRunForever()) {
             builder = builder.repeatForever();
         } else {
-            builder = builder.withRepeatCount(jobInfo.getTotalFireCount() - 1);
+            builder = builder.withRepeatCount(travelJobInfo.getTotalFireCount() - 1);
         }
 
         return TriggerBuilder
                 .newTrigger()
                 .withIdentity(jobClass.getSimpleName())
                 .withSchedule(builder)
-                .startAt(new Date(System.currentTimeMillis() + jobInfo.getInitialOffsetMs()))
+                .startAt(new Date(System.currentTimeMillis() + travelJobInfo.getInitialOffsetMs()))
                 .build();
     }
 }

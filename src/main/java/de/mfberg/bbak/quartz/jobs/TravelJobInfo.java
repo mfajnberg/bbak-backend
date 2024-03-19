@@ -1,4 +1,4 @@
-package de.mfberg.bbak.model.jobs;
+package de.mfberg.bbak.quartz.jobs;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class JobInfo {
+public class TravelJobInfo {
      private int totalFireCount;
      private boolean runForever = false;
      private int repeatIntervalMs;

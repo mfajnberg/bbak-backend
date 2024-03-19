@@ -1,20 +1,30 @@
 package de.mfberg.bbak.controllers;
 
-import de.mfberg.bbak.services.SchedulerService;
+import de.mfberg.bbak.services.admin.AccountService;
+import de.mfberg.bbak.services.admin.WorldmapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/admin")
 @RequiredArgsConstructor
 public class AdminController {
-    private final SchedulerService schedulerService;
+    private final WorldmapService worldmapService;
+    private final AccountService accountService;
 
-    @GetMapping
-    public ResponseEntity<String> sayHello() {
+    @GetMapping("/worldmap")
+    public ResponseEntity<String> getWorldmap() {
+        return ResponseEntity.ok("Hello from secured endpoint");
+    }
+
+    @PostMapping("/worldmap-edit")
+    public ResponseEntity<String> editWorldmap() {
+        return ResponseEntity.ok("Hello from secured endpoint");
+    }
+
+    @DeleteMapping("/user")
+    public ResponseEntity<String> deleteUser() {
         return ResponseEntity.ok("Hello from secured endpoint");
     }
 }

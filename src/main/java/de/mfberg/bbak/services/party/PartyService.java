@@ -1,9 +1,9 @@
 package de.mfberg.bbak.services.party;
 
 import de.mfberg.bbak.dto.TravelRequest;
-import de.mfberg.bbak.quartz.jobs.TravelJob;
-import de.mfberg.bbak.quartz.jobs.TravelJobInfo;
-import de.mfberg.bbak.quartz.SchedulerService;
+import de.mfberg.bbak.services.jobengine.jobs.TravelJob;
+import de.mfberg.bbak.services.jobengine.jobs.TravelJobInfo;
+import de.mfberg.bbak.services.jobengine.SchedulerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

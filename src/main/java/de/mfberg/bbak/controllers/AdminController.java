@@ -18,7 +18,7 @@ public class AdminController {
         return ResponseEntity.ok("Hello from secured endpoint");
     }
 
-    @PostMapping("/worldmap-edit")
+    @PostMapping("/worldmap")
     public ResponseEntity<String> editWorldmap() {
         return ResponseEntity.ok("Hello from secured endpoint");
     }

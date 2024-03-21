@@ -1,4 +1,4 @@
-package de.mfberg.bbak.quartz;
+package de.mfberg.bbak.services.jobengine;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

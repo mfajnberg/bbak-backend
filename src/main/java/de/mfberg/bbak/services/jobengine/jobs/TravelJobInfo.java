@@ -1,4 +1,4 @@
-package de.mfberg.bbak.quartz.jobs;
+package de.mfberg.bbak.services.jobengine.jobs;
 
 import lombok.*;
 

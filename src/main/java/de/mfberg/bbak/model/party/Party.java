@@ -1,4 +1,4 @@
-package de.mfberg.bbak.model;
+package de.mfberg.bbak.model.party;
 
 import de.mfberg.bbak.model.adventuremap.HexTile;
 import de.mfberg.bbak.model.creature.CreatureBase;
@@ -21,4 +21,6 @@ public class Party {
 
     @OneToOne
     private CreatureBase leader;
+    @OneToMany
+    private List<CreatureBase> members;
 }

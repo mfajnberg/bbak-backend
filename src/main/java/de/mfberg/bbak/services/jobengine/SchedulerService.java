@@ -1,6 +1,6 @@
-package de.mfberg.bbak.quartz;
+package de.mfberg.bbak.services.jobengine;
 
-import de.mfberg.bbak.quartz.jobs.TravelJobInfo;
+import de.mfberg.bbak.services.jobengine.jobs.TravelJobInfo;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,6 @@
-package de.mfberg.bbak.quartz.jobs;
+package de.mfberg.bbak.services.jobengine.jobs;
 
-import de.mfberg.bbak.quartz.ApplicationContextProvider;
+import de.mfberg.bbak.services.jobengine.ApplicationContextProvider;
 import de.mfberg.bbak.repo.PartyRepository;
 import lombok.Builder;
 import org.quartz.Job;

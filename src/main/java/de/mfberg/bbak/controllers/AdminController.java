@@ -22,7 +22,7 @@ public class AdminController {
             @RequestParam(defaultValue = "0") Integer aroundAxialR,
             @RequestParam(defaultValue = "3") byte radius
     ) {
-        return ResponseEntity.ok(worldmapService.getHexTiles(aroundAxialQ, aroundAxialR, radius));
+            return ResponseEntity.ok(worldmapService.getHexTileDTOs(aroundAxialQ, aroundAxialR, radius));
     }
 
     @PostMapping("/worldmap")
@@ -37,6 +37,7 @@ public class AdminController {
 
     @DeleteMapping("/account")
     public ResponseEntity<String> deleteUserAccount() {
+        // todo: implement user account deletion endpoint
         return ResponseEntity.ok("User account deletion successful.");
     }
 }

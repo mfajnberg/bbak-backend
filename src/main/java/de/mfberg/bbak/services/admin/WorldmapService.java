@@ -29,6 +29,20 @@ public class WorldmapService {
         return hexRepository.findAllById(vectors);
     }
 
+    public List<HexTileDTO> getHexTileDTOs(Integer aroundAxialQ, Integer aroundAxialR, byte radius) {
+        Set<HexVector> vectors = makeGridVectors(aroundAxialQ, aroundAxialR, radius);
+        List<HexTileDTO> result = new ArrayList<HexTileDTO>();
+        vectors.forEach(axial -> {
+            HexTileDTO hexDTO = new HexTileDTO(axial, null);
+            Optional<PlaceBase> place = placeRepository.findPlaceByHexVector(axial.getQ(), axial.getR());
+            place.ifPresent(existingPlace -> {
+                hexDTO.setPlaceType(determinePlaceType(existingPlace));
+            });
+            result.add(hexDTO);
+        });
+        return result;
+    }
+
     @Transactional
     public void editWorldmap(List<HexTileDTO> worldGenData) {
         worldGenData.forEach(hexDTO -> {
@@ -45,7 +59,6 @@ public class WorldmapService {
                 if (newPlace != null) { // `placeType` should be anything but `NONE`
                     existingHex.setPlace(newPlace);
                     hexRepository.save(existingHex);
-                    newPlace.setLocation(existingHex);
                     placeRepository.save(newPlace);
                 }
             }, () -> { // There's no `HexTile` at the given coordinates, consequently there's no `PlaceBase` either
@@ -54,20 +67,29 @@ public class WorldmapService {
                 hexRepository.save(newHex);
                 entityManager.flush();
                 if (newPlace != null) { // `placeType` was anything but `NONE` or null
-                    newPlace.setLocation(newHex);
                     placeRepository.save(newPlace);
                     newHex.setPlace(newPlace);
+                    hexRepository.save(newHex);
                 }
             });
         });
     }
     private PlaceBase createPlace(PlaceType placeType) {
         return switch (placeType) {
+            case null -> null;
             case NONE -> null;
             case FOREST -> new Forest();
             default -> throw new IllegalArgumentException("Unknown SiteType: " + placeType);
         };
     }
+
+    private PlaceType determinePlaceType(PlaceBase place) {
+        if (place instanceof Forest) return PlaceType.FOREST;
+        // else if (place instanceof SUBCLASS) return PlaceType.TYPE;
+        // ...
+        else return PlaceType.NONE;
+    }
+
 
     private Set<HexVector> makeGridVectors(Integer aroundAxialQ, Integer aroundAxialR, byte radius) {
             Set<HexVector> result = new HashSet<HexVector>();

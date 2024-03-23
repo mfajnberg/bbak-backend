@@ -31,7 +31,7 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .registrationTime(new Date(System.currentTimeMillis()))
-                .role(Role.USER)
+                .role(Role.ADMIN) // todo: change to Role.USER
                 .build();
         userRepository.save(user);
         var accessToken = jwtService.generateAccessToken(user);

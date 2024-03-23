@@ -1,7 +1,7 @@
 package de.mfberg.bbak.dto;
 
 import de.mfberg.bbak.model.adventuremap.HexVector;
-import de.mfberg.bbak.model.site.SiteType;
+import de.mfberg.bbak.model.site.PlaceType;
 import lombok.*;
 
 @Data
@@ -10,5 +10,5 @@ import lombok.*;
 @NoArgsConstructor
 public class HexTileDTO {
     private HexVector axial;
-    private SiteType siteType;
+    private PlaceType placeType;
 }

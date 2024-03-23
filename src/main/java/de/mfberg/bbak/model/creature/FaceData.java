@@ -10,6 +10,6 @@ import lombok.Data;
 public class FaceData {
     @Id
     @GeneratedValue
-    private Long id;
+    private long id;
 
 }

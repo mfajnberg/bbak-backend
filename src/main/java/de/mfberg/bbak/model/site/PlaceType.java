@@ -1,6 +1,6 @@
 package de.mfberg.bbak.model.site;
 
-public enum SiteType {
+public enum PlaceType {
     NONE,
     FOREST,
 }

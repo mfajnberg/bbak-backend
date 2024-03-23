@@ -13,7 +13,7 @@ import java.util.List;
 public class Party {
     @Id
     @GeneratedValue
-    private Long id;
+    private long id;
     @OneToOne
     private HexTile location;
     @OneToOne

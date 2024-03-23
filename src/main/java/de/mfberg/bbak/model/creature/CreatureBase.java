@@ -12,7 +12,7 @@ import java.util.List;
 public class CreatureBase {
     @Id
     @GeneratedValue
-    private Long id;
+    private long id;
 
     private String name;
     private String description;

@@ -1,13 +1,16 @@
 package de.mfberg.bbak.model.creature;
 
+import de.mfberg.bbak.dto.CreatureDTO;
 import de.mfberg.bbak.model.party.Party;
 import de.mfberg.bbak.model.item.ItemBase;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Entity
 public class CreatureBase {
     @Id

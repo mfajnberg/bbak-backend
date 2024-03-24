@@ -1,7 +1,9 @@
 package de.mfberg.bbak.controllers;
 
-import de.mfberg.bbak.dto.CreateAvatarRequest;
+import de.mfberg.bbak.dto.CreatureDTO;
+import de.mfberg.bbak.services.authentication.JwtService;
 import de.mfberg.bbak.services.avatar.AvatarService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,12 +14,12 @@ import org.springframework.web.bind.annotation.*;
 public class AvatarController {
     private final AvatarService service;
     @PostMapping("/create")
-    public ResponseEntity<?> createAvatar(CreateAvatarRequest newAvatar) {
+    public ResponseEntity<?> createAvatar(HttpServletRequest request, @RequestBody CreatureDTO newAvatar) {
         try {
-            return ResponseEntity.ok(service.createAvatar(newAvatar));
+            service.createAvatar(request, newAvatar);
+            return ResponseEntity.ok().body("Avatar creation successful.");
         } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body("Received invalid avatar data.");
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 }

@@ -16,8 +16,6 @@ public class Party {
     private long id;
     @OneToOne
     private HexTile location;
-    @OneToOne
-    private HexTile destination;
 
     @OneToOne
     private CreatureBase leader;

@@ -1,5 +1,6 @@
 package de.mfberg.bbak.dto;
 
+import de.mfberg.bbak.model.creatures.CreatureType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreatureDTO {
+    private CreatureType creatureType;
     private String name;
     private String description;
 

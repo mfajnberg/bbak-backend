@@ -1,6 +1,6 @@
-package de.mfberg.bbak.model.item;
+package de.mfberg.bbak.model.items;
 
-import de.mfberg.bbak.model.creature.CreatureBase;
+import de.mfberg.bbak.model.creatures.CreatureBase;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;

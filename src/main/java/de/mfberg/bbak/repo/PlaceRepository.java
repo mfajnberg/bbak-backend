@@ -1,8 +1,6 @@
 package de.mfberg.bbak.repo;
 
-import de.mfberg.bbak.model.adventuremap.HexTile;
-import de.mfberg.bbak.model.adventuremap.HexVector;
-import de.mfberg.bbak.model.site.PlaceBase;
+import de.mfberg.bbak.model.places.PlaceBase;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

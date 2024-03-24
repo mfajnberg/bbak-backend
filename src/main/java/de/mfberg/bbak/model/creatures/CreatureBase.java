@@ -1,10 +1,8 @@
-package de.mfberg.bbak.model.creature;
+package de.mfberg.bbak.model.creatures;
 
-import de.mfberg.bbak.dto.CreatureDTO;
 import de.mfberg.bbak.model.party.Party;
-import de.mfberg.bbak.model.item.ItemBase;
+import de.mfberg.bbak.model.items.ItemBase;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
@@ -12,11 +10,13 @@ import java.util.List;
 @Data
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Entity
-public class CreatureBase {
+public abstract class CreatureBase {
     @Id
     @GeneratedValue
     private long id;
 
+    @Enumerated(EnumType.STRING)
+    private CreatureType creatureType;
     private String name;
     private String description;
 

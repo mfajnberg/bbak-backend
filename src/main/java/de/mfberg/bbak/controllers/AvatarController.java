@@ -1,8 +1,7 @@
 package de.mfberg.bbak.controllers;
 
 import de.mfberg.bbak.dto.CreatureDTO;
-import de.mfberg.bbak.services.authentication.JwtService;
-import de.mfberg.bbak.services.avatar.AvatarService;
+import de.mfberg.bbak.services.creatures.AvatarService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

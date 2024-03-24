@@ -1,8 +1,6 @@
-package de.mfberg.bbak.model.site;
+package de.mfberg.bbak.model.places;
 
-import de.mfberg.bbak.model.adventuremap.HexTile;
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

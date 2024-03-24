@@ -1,7 +1,7 @@
 package de.mfberg.bbak.dto;
 
 import de.mfberg.bbak.model.adventuremap.HexVector;
-import de.mfberg.bbak.model.site.PlaceType;
+import de.mfberg.bbak.model.places.PlaceType;
 import lombok.*;
 
 @Data

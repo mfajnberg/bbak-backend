@@ -1,6 +1,6 @@
 package de.mfberg.bbak.model.adventuremap;
 
-import de.mfberg.bbak.model.site.PlaceBase;
+import de.mfberg.bbak.model.places.PlaceBase;
 import jakarta.persistence.*;
 import lombok.*;
 

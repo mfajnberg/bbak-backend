@@ -1,4 +1,4 @@
-package de.mfberg.bbak.model.site;
+package de.mfberg.bbak.model.places;
 
 import jakarta.persistence.Entity;
 import lombok.Getter;

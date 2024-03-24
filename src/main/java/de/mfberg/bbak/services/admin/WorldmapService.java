@@ -1,13 +1,14 @@
 package de.mfberg.bbak.services.admin;
 
 import de.mfberg.bbak.dto.HexTileDTO;
-import de.mfberg.bbak.model.site.Forest;
-import de.mfberg.bbak.model.site.PlaceBase;
-import de.mfberg.bbak.model.site.PlaceType;
+import de.mfberg.bbak.model.places.Forest;
+import de.mfberg.bbak.model.places.PlaceBase;
+import de.mfberg.bbak.model.places.PlaceType;
 import de.mfberg.bbak.repo.HexRepository;
 import de.mfberg.bbak.model.adventuremap.HexTile;
 import de.mfberg.bbak.model.adventuremap.HexVector;
 import de.mfberg.bbak.repo.PlaceRepository;
+import de.mfberg.bbak.services.places.PlaceFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +48,7 @@ public class WorldmapService {
     public void editWorldmap(List<HexTileDTO> worldGenData) {
         worldGenData.forEach(hexDTO -> {
             HexVector hexVector = new HexVector(hexDTO.getAxial().getQ(), hexDTO.getAxial().getR());
-            PlaceBase newPlace = createPlace(hexDTO.getPlaceType());
+            PlaceBase newPlace = new PlaceFactory().fromPlaceType(hexDTO.getPlaceType());
             Optional<HexTile> dbHex = hexRepository.findByAxial(hexVector);
             dbHex.ifPresentOrElse(existingHex -> { // A HexTile exists, possibly with an associated place
                 PlaceBase existingPlace = existingHex.getPlace();
@@ -73,14 +74,6 @@ public class WorldmapService {
                 }
             });
         });
-    }
-    private PlaceBase createPlace(PlaceType placeType) {
-        return switch (placeType) {
-            case null -> null;
-            case NONE -> null;
-            case FOREST -> new Forest();
-            default -> throw new IllegalArgumentException("Unknown SiteType: " + placeType);
-        };
     }
 
     private PlaceType determinePlaceType(PlaceBase place) {

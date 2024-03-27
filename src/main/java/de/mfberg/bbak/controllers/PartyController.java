@@ -21,15 +21,15 @@ public class PartyController {
     public ResponseEntity<String> createParty(HttpServletRequest request, @RequestBody PartyDTO partyData) {
         try {
             service.createParty(request, partyData);
-            return ResponseEntity.ok("");
+            return ResponseEntity.ok("Party creation successful.");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 
     @PostMapping("/travel")
-    public ResponseEntity<String> travel(@RequestBody TravelRequest request) {
-        service.runTravelJob(request);
+    public ResponseEntity<String> travel(@RequestBody TravelRequest travelRequest) {
+        service.beginTravel(travelRequest); //todo: add party.location axial to each of the vectors in the path provided
         return ResponseEntity.ok("");
     }
 }

@@ -1,6 +1,6 @@
-package de.mfberg.bbak.services.jobengine;
+package de.mfberg.bbak.services.party;
 
-import de.mfberg.bbak.services.jobengine.jobs.TravelJobInfo;
+import de.mfberg.bbak.jobs.TravelData;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.AllArgsConstructor;
@@ -18,28 +18,28 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class SchedulerService {
-    private static final Logger LOG = LoggerFactory.getLogger(SchedulerService.class);
+public class TravelJobService {
+    private static final Logger LOG = LoggerFactory.getLogger(TravelJobService.class);
     private final Scheduler scheduler;
 
-    public void schedule(final Class jobClass, final TravelJobInfo travelJobInfo) {
+    public void schedule(final Class jobClass, final TravelData travelData) {
         try {
             scheduler.scheduleJob(
-                    buildJobDetail(jobClass, travelJobInfo),
-                    buildTrigger(jobClass, travelJobInfo));
+                    buildJobDetail(jobClass, travelData),
+                    buildTrigger(jobClass, travelData));
         } catch (SchedulerException e) {
             LOG.error(e.getMessage(), e);
         }
     }
 
-    public List<TravelJobInfo> getAllRunningJobs() {
+    public List<TravelData> getAllRunningJobs() {
         try {
             return scheduler.getJobKeys(GroupMatcher.anyGroup())
                     .stream()
                     .map(jobKey -> {
                         try {
                             final JobDetail jobDetail = scheduler.getJobDetail(jobKey);
-                            return (TravelJobInfo) jobDetail.getJobDataMap().get(jobKey.getName());
+                            return (TravelData) jobDetail.getJobDataMap().get(jobKey.getName());
                         } catch (SchedulerException e) {
                             LOG.error(e.getMessage(), e);
                             return null;
@@ -53,12 +53,12 @@ public class SchedulerService {
         }
     }
 
-    public TravelJobInfo getRunningJob(String jobId) {
+    public TravelData getRunningJob(String jobId) {
         try {
             final JobDetail jobDetail = scheduler.getJobDetail(new JobKey(jobId));
             if (jobDetail == null)
                 return null;
-            return (TravelJobInfo) jobDetail.getJobDataMap().get(jobId);
+            return (TravelData) jobDetail.getJobDataMap().get(jobId);
         } catch (SchedulerException e) {
             LOG.error(e.getMessage(), e);
             return null;
@@ -83,9 +83,9 @@ public class SchedulerService {
         }
     }
 
-    public static JobDetail buildJobDetail(final Class jobClass, final TravelJobInfo travelJobInfo) {
+    private JobDetail buildJobDetail(final Class jobClass, final Object jobData) {
         final JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.put(jobClass.getSimpleName(), travelJobInfo);
+        jobDataMap.put("jobData", jobData);
 
         return JobBuilder
                 .newJob(jobClass)
@@ -94,20 +94,12 @@ public class SchedulerService {
                 .build();
     }
 
-    public static Trigger buildTrigger(final Class jobClass, final TravelJobInfo travelJobInfo) {
-        SimpleScheduleBuilder builder = SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(travelJobInfo.getRepeatIntervalMs());
-
-        if (travelJobInfo.isRunForever()) {
-            builder = builder.repeatForever();
-        } else {
-            builder = builder.withRepeatCount(travelJobInfo.getTotalFireCount() - 1);
-        }
-
+    private Trigger buildTrigger(final Class jobClass, final TravelData travelData) {
         return TriggerBuilder
                 .newTrigger()
-                .withIdentity(jobClass.getSimpleName())
-                .withSchedule(builder)
-                .startAt(new Date(System.currentTimeMillis() + travelJobInfo.getInitialOffsetMs()))
+                .withIdentity("cool name", "travelJobs")
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule())
+                .startAt(new Date(System.currentTimeMillis()))
                 .build();
     }
 }

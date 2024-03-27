@@ -11,12 +11,10 @@ import de.mfberg.bbak.repo.PartyRepository;
 import de.mfberg.bbak.repo.UserRepository;
 import de.mfberg.bbak.services.authentication.JwtService;
 import de.mfberg.bbak.services.creatures.CreatureFactory;
-import de.mfberg.bbak.services.jobengine.jobs.TravelJob;
-import de.mfberg.bbak.services.jobengine.jobs.TravelJobInfo;
-import de.mfberg.bbak.services.jobengine.SchedulerService;
+import de.mfberg.bbak.jobs.TravelJob;
+import de.mfberg.bbak.jobs.TravelData;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.misc.LogManager;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -27,17 +25,15 @@ public class PartyService {
     private final UserRepository userRepository;
     private final CreatureRepository creatureRepository;
     private final PartyRepository partyRepository;
-    private final SchedulerService scheduler;
+    private final TravelJobService travelJobService;
     private final JwtService jwtService;
 
-    public void runTravelJob(TravelRequest request) {
-        final TravelJobInfo travelJobInfo = TravelJobInfo.builder()
-                .totalFireCount(5)
-                .repeatIntervalMs(2000)
-                .initialOffsetMs(1000)
-                .callbackData("party x traveling to y")
+    public void beginTravel(TravelRequest travelRequest) {
+        final TravelData travelData = TravelData.builder()
+                .path(travelRequest.getPath())
+                // todo: set a travel speed, etc.
                 .build();
-        scheduler.schedule(TravelJob.class, travelJobInfo);
+        travelJobService.schedule(TravelJob.class, travelData);
     }
 
     public void createParty(HttpServletRequest request, PartyDTO partyData) throws Exception {

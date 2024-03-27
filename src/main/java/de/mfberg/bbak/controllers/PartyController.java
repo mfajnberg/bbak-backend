@@ -2,7 +2,7 @@ package de.mfberg.bbak.controllers;
 
 import de.mfberg.bbak.dto.PartyDTO;
 import de.mfberg.bbak.dto.TravelRequest;
-import de.mfberg.bbak.services.party.PartyService;
+import de.mfberg.bbak.services.parties.PartyService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +23,7 @@ public class PartyController {
             service.createParty(request, partyData);
             return ResponseEntity.ok("Party creation successful.");
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }

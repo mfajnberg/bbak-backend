@@ -1,6 +1,6 @@
 package de.mfberg.bbak.model.creatures;
 
-import de.mfberg.bbak.model.party.Party;
+import de.mfberg.bbak.model.parties.Party;
 import de.mfberg.bbak.model.items.ItemBase;
 import jakarta.persistence.*;
 import lombok.Data;

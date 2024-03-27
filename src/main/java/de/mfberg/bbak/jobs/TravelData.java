@@ -1,6 +1,6 @@
 package de.mfberg.bbak.jobs;
 
-import de.mfberg.bbak.model.adventuremap.HexVector;
+import de.mfberg.bbak.model.worldmap.HexVector;
 import lombok.*;
 
 import java.io.Serial;

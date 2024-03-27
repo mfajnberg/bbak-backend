@@ -1,4 +1,4 @@
-package de.mfberg.bbak.model.adventuremap;
+package de.mfberg.bbak.model.worldmap;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;

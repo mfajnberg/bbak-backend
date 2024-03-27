@@ -1,11 +1,9 @@
-package de.mfberg.bbak.model.party;
+package de.mfberg.bbak.model.parties;
 
-import de.mfberg.bbak.model.adventuremap.HexTile;
+import de.mfberg.bbak.model.worldmap.HexTile;
 import de.mfberg.bbak.model.creatures.CreatureBase;
 import jakarta.persistence.*;
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 @Entity

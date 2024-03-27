@@ -1,20 +1,24 @@
-package de.mfberg.bbak.services.party;
+package de.mfberg.bbak.services.parties;
 
 import de.mfberg.bbak.dto.PartyDTO;
 import de.mfberg.bbak.dto.TravelRequest;
 import de.mfberg.bbak.model.creatures.Avatar;
 import de.mfberg.bbak.model.creatures.CreatureBase;
-import de.mfberg.bbak.model.party.Party;
+import de.mfberg.bbak.model.parties.Party;
 import de.mfberg.bbak.model.user.User;
 import de.mfberg.bbak.repo.CreatureRepository;
 import de.mfberg.bbak.repo.PartyRepository;
 import de.mfberg.bbak.repo.UserRepository;
+import de.mfberg.bbak.services.SchedulerService;
 import de.mfberg.bbak.services.authentication.JwtService;
 import de.mfberg.bbak.services.creatures.CreatureFactory;
 import de.mfberg.bbak.jobs.TravelJob;
 import de.mfberg.bbak.jobs.TravelData;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.quartz.SchedulerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -25,15 +29,16 @@ public class PartyService {
     private final UserRepository userRepository;
     private final CreatureRepository creatureRepository;
     private final PartyRepository partyRepository;
-    private final TravelJobService travelJobService;
     private final JwtService jwtService;
+    private final TravelService travelService;
+    private static final Logger LOG = LoggerFactory.getLogger(TravelService.class);
 
     public void beginTravel(TravelRequest travelRequest) {
         final TravelData travelData = TravelData.builder()
                 .path(travelRequest.getPath())
                 // todo: set a travel speed, etc.
                 .build();
-        travelJobService.schedule(TravelJob.class, travelData);
+        travelService.schedule(TravelJob.class, travelData);
     }
 
     public void createParty(HttpServletRequest request, PartyDTO partyData) throws Exception {

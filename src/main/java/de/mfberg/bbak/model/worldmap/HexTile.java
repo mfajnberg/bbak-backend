@@ -1,4 +1,4 @@
-package de.mfberg.bbak.model.adventuremap;
+package de.mfberg.bbak.model.worldmap;
 
 import de.mfberg.bbak.model.places.PlaceBase;
 import jakarta.persistence.*;

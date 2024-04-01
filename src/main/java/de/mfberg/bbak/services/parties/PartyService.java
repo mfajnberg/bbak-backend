@@ -6,17 +6,18 @@ import de.mfberg.bbak.model.creatures.Avatar;
 import de.mfberg.bbak.model.creatures.CreatureBase;
 import de.mfberg.bbak.model.parties.Party;
 import de.mfberg.bbak.model.user.User;
+import de.mfberg.bbak.model.worldmap.HexVector;
 import de.mfberg.bbak.repo.CreatureRepository;
+import de.mfberg.bbak.repo.HexRepository;
 import de.mfberg.bbak.repo.PartyRepository;
 import de.mfberg.bbak.repo.UserRepository;
-import de.mfberg.bbak.services.SchedulerService;
+import de.mfberg.bbak.services.QuartzService;
 import de.mfberg.bbak.services.authentication.JwtService;
 import de.mfberg.bbak.services.creatures.CreatureFactory;
 import de.mfberg.bbak.jobs.TravelJob;
-import de.mfberg.bbak.jobs.TravelData;
+import de.mfberg.bbak.jobs.TravelJobInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,30 +30,37 @@ public class PartyService {
     private final UserRepository userRepository;
     private final CreatureRepository creatureRepository;
     private final PartyRepository partyRepository;
+    private final HexRepository hexRepository;
     private final JwtService jwtService;
     private final TravelService travelService;
-    private static final Logger LOG = LoggerFactory.getLogger(TravelService.class);
+    private final QuartzService quartzService;
 
-    public void beginTravel(TravelRequest travelRequest) {
-        final TravelData travelData = TravelData.builder()
+    public void beginTravel(HttpServletRequest request, TravelRequest travelRequest) throws Exception {
+        Party party = extractPartyFromClaim(request);
+
+        // todo::: check travel request validity
+        // disallow:
+        // - traveling to blocked tiles or current location
+        // - skipping tiles todo: implement distance check
+        // - starting a travel while already traveling
+        travelRequest.getPath().forEach(hexVec -> {
+            hexVec.setQ(hexVec.getQ() + party.getLocation().getAxial().getQ());
+            hexVec.setR(hexVec.getR() + party.getLocation().getAxial().getR());
+        });
+        final TravelJobInfo travelJobInfo = TravelJobInfo.builder()
+                .partyId(party.getId())
                 .path(travelRequest.getPath())
-                // todo: set a travel speed, etc.
+                .durationMillis(50000)
                 .build();
-        travelService.schedule(TravelJob.class, travelData);
+        travelJobInfo.setLabel(travelService.makeLabel(travelJobInfo));
+        travelService.schedule(TravelJob.class, travelJobInfo);
     }
 
     public void createParty(HttpServletRequest request, PartyDTO partyData) throws Exception {
-        String jwt = request.getHeader("Authorization").substring(7);
-        String username = jwtService.extractUsername(jwt);
-        Optional<User> user = userRepository.findByEmail(username);
-        if (user.isEmpty())
-            throw new Exception("Error retrieving user from claim.");
-        Optional<Avatar> leader = creatureRepository.findAvatarByOwner(user.get());
-        // todo: instead, fetch by `partyData.leader.name` and validate owner
-        if (leader.isEmpty())
-            throw new Exception("Please create an avatar before creating a party.");
+        Avatar leader = extractAvatarFromClaim(request);
         Party newParty = new Party();
-        newParty.setLeader(leader.get());
+        newParty.setLeader(leader);
+        newParty.setLocation(hexRepository.getReferenceById(new HexVector(0, 0)));
         partyRepository.save(newParty);
         partyData.getMembers().forEach(memberDTO -> {
             CreatureBase newMember = null;
@@ -64,5 +72,37 @@ public class PartyService {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    private Avatar extractAvatarFromClaim(HttpServletRequest request) throws Exception {
+        String jwt = request.getHeader("Authorization").substring(7);
+        String username = jwtService.extractUsername(jwt);
+        Optional<User> user = userRepository.findByEmail(username);
+        if (user.isEmpty())
+            throw new Exception("Error retrieving user from claim.");
+
+        Optional<Avatar> leader = creatureRepository.findAvatarByOwner(user.get());
+        if (leader.isEmpty())
+            throw new Exception("Error retrieving leader from claim.");
+
+        return leader.get();
+    }
+
+    private Party extractPartyFromClaim(HttpServletRequest request) throws Exception {
+        String jwt = request.getHeader("Authorization").substring(7);
+        String username = jwtService.extractUsername(jwt);
+        Optional<User> user = userRepository.findByEmail(username);
+        if (user.isEmpty())
+            throw new Exception("Error retrieving user from claim.");
+
+        Optional<Avatar> leader = creatureRepository.findAvatarByOwner(user.get());
+        if (leader.isEmpty())
+            throw new Exception("Error retrieving leader from claim.");
+
+        Optional<Party> party = partyRepository.findPartyByLeader(leader.get());
+        if (party.isEmpty())
+            throw new Exception("Error retrieving party from claim.");
+
+        return party.get();
     }
 }

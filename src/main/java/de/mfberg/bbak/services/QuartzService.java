@@ -1,6 +1,6 @@
 package de.mfberg.bbak.services;
 
-import de.mfberg.bbak.jobs.TravelData;
+import de.mfberg.bbak.jobs.TravelJobInfo;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.AllArgsConstructor;
@@ -13,18 +13,18 @@ import java.util.Date;
 
 @Service
 @AllArgsConstructor
-public class SchedulerService {
-    private static final Logger LOG = LoggerFactory.getLogger(SchedulerService.class);
-    private final Scheduler quarz;
+public class QuartzService {
+    private static final Logger LOG = LoggerFactory.getLogger(QuartzService.class);
+    private final Scheduler scheduler;
 
     public Scheduler getScheduler() {
-        return quarz;
+        return scheduler;
     }
 
     @PostConstruct
     public void init() {
         try {
-            quarz.start();
+            scheduler.start();
         } catch (SchedulerException e) {
             LOG.error(e.getMessage(), e);
         }
@@ -33,31 +33,31 @@ public class SchedulerService {
     @PreDestroy
     public void preDestroy() {
         try {
-            quarz.shutdown();
+            scheduler.shutdown();
         } catch (SchedulerException e) {
             LOG.error(e.getMessage(), e);
         }
     }
 
-    public JobDetail buildJobDetail(final Class jobClass, final Object jobData) {
+    public JobDetail buildJobDetail(final Class jobClass, final TravelJobInfo jobInfo) {
         final JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.put("jobData", jobData);
+        jobDataMap.put("jobData", jobInfo);
 
         return JobBuilder
                 .newJob(jobClass)
                 // todo: identity should associate the party and 'handle' collisions.
-                .withIdentity(jobClass.getSimpleName())
+                .withIdentity(jobInfo.getLabel())
                 .setJobData(jobDataMap)
                 .build();
     }
 
     // todo: either make completely generic OR account for different Job classes.
-    public Trigger buildTrigger(final Class jobClass, final TravelData travelData) {
+    public Trigger buildTrigger(final Class jobClass, final TravelJobInfo jobInfo) {
         return TriggerBuilder
                 .newTrigger()
-                .withIdentity("cool name", "travelJobs")
+                .withIdentity(jobInfo.getLabel(), jobInfo.getGroupLabel())
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule())
-                .startAt(new Date(System.currentTimeMillis()))
+                .startAt(new Date(System.currentTimeMillis() + jobInfo.getDurationMillis()))
                 .build();
     }
 

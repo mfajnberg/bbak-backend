@@ -13,5 +13,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TravelRequest {
-    private List<HexVector> path;
+    private List<HexVector> path; // relative to party.location, includes party.location
 }

@@ -12,8 +12,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TravelData implements Serializable {
+public class TravelJobInfo implements Serializable {
      @Serial
      private static final long serialVersionUID = 1L;
+     private final String groupLabel = "travelJobs";
+     private String label;
+     private Long partyId; // job identity (forbid >1 travel jobs for 1 party)
      private List<HexVector> path;
+     private long durationMillis; // depends on the places on path[0]
+
+     
 }

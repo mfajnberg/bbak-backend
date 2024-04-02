@@ -19,19 +19,19 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class WorldmapService {
+public class WorldEditService {
     private final HexRepository hexRepository;
     private final PlaceRepository placeRepository;
     @PersistenceContext
     private EntityManager entityManager;
 
     public List<HexTile> getHexTiles(Integer aroundAxialQ, Integer aroundAxialR, byte radius) {
-        Set<HexVector> vectors = makeGridVectors(aroundAxialQ, aroundAxialR, radius);
+        Set<HexVector> vectors = HexVector.makeGrid(aroundAxialQ, aroundAxialR, radius);
         return hexRepository.findAllById(vectors);
     }
 
     public List<HexTileDTO> getHexTileDTOs(Integer aroundAxialQ, Integer aroundAxialR, byte radius) {
-        Set<HexVector> vectors = makeGridVectors(aroundAxialQ, aroundAxialR, radius);
+        Set<HexVector> vectors = HexVector.makeGrid(aroundAxialQ, aroundAxialR, radius);
         List<HexTileDTO> result = new ArrayList<HexTileDTO>();
         vectors.forEach(axial -> {
             HexTileDTO hexDTO = new HexTileDTO(axial, null);
@@ -81,44 +81,5 @@ public class WorldmapService {
         // else if (place instanceof SUBCLASS) return PlaceType.TYPE;
         // ...
         else return PlaceType.NONE;
-    }
-
-
-    private Set<HexVector> makeGridVectors(Integer aroundAxialQ, Integer aroundAxialR, byte radius) {
-            Set<HexVector> result = new HashSet<HexVector>();
-            result.add(new HexVector(0, 0));
-            for (int currentRing = 1; currentRing <= radius; currentRing++)
-            {
-                HexVector vectorNE = new HexVector(currentRing, -1 * currentRing);
-                for (int i = 0; i < currentRing; i++)
-                    result.add(new HexVector(
-                            vectorNE.getQ() + aroundAxialQ, i + vectorNE.getR() + aroundAxialR));
-
-                HexVector vectorE = new HexVector(currentRing, 0);
-                for (int i = 0; i < currentRing; i++)
-                    result.add(new HexVector(
-                            -1 * i + vectorE.getQ() + aroundAxialQ, i + vectorE.getR() + aroundAxialR));
-
-                HexVector vectorSE = new HexVector(0, currentRing);
-                for (int i = 0; i < currentRing; i++)
-                    result.add(new HexVector(
-                            -1 * i + vectorSE.getQ() + aroundAxialQ, vectorSE.getR() + aroundAxialR));
-
-                HexVector vectorSW = new HexVector(-1 * currentRing, currentRing);
-                for (int i = 0; i < currentRing; i++)
-                    result.add(new HexVector(
-                            vectorSW.getQ() + aroundAxialQ, -1 * i + vectorSW.getR() + aroundAxialR));
-
-                HexVector vectorW = new HexVector(-1 * currentRing, 0);
-                for (int i = 0; i < currentRing; i++)
-                    result.add(new HexVector(
-                            i + vectorW.getQ() + aroundAxialQ, -1 * i + vectorW.getR() + aroundAxialR));
-
-                HexVector vectorNW = new HexVector(0, -1 * currentRing);
-                for (int i = 0; i < currentRing; i++)
-                    result.add(new HexVector(
-                            i + vectorNW.getQ() + aroundAxialQ, vectorNW.getR() + aroundAxialR));
-            }
-            return result;
     }
 }

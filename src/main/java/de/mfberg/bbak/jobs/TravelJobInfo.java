@@ -21,5 +21,4 @@ public class TravelJobInfo implements Serializable {
      private List<HexVector> path;
      private long durationMillis; // depends on the places on path[0]
 
-     
 }

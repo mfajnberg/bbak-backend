@@ -5,7 +5,9 @@ import de.mfberg.bbak.dto.TravelRequest;
 import de.mfberg.bbak.model.creatures.Avatar;
 import de.mfberg.bbak.model.creatures.CreatureBase;
 import de.mfberg.bbak.model.parties.Party;
+import de.mfberg.bbak.model.places.PlaceBase;
 import de.mfberg.bbak.model.user.User;
+import de.mfberg.bbak.model.worldmap.HexTile;
 import de.mfberg.bbak.model.worldmap.HexVector;
 import de.mfberg.bbak.repo.CreatureRepository;
 import de.mfberg.bbak.repo.HexRepository;
@@ -18,11 +20,16 @@ import de.mfberg.bbak.jobs.TravelJob;
 import de.mfberg.bbak.jobs.TravelJobInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.quartz.JobKey;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -38,15 +45,37 @@ public class PartyService {
     public void beginTravel(HttpServletRequest request, TravelRequest travelRequest) throws Exception {
         Party party = extractPartyFromClaim(request);
 
-        // todo::: check travel request validity
-        // disallow:
-        // - traveling to blocked tiles or current location
-        // - skipping tiles todo: implement distance check
-        // - starting a travel while already traveling
-        travelRequest.getPath().forEach(hexVec -> {
+        for (JobKey jobKey : quartzService.getScheduler().getJobKeys(GroupMatcher.jobGroupEquals("travelJobs"))) {
+            if (jobKey.getName().contains(party.getId() + ":")) {
+                throw new Exception("Failed to begin travel (party already travelling)");
+            }
+        }
+
+        HexVector hexVecPrevious = null;
+        List<HexTile> hexRefPath = new ArrayList<>();
+        for (HexVector hexVec : travelRequest.getPath()) {
             hexVec.setQ(hexVec.getQ() + party.getLocation().getAxial().getQ());
             hexVec.setR(hexVec.getR() + party.getLocation().getAxial().getR());
-        });
+            if (hexVecPrevious != null) {
+                long distance = HexVector.axialDistance(hexVecPrevious, hexVec);
+                if (distance == 0)
+                    throw new RuntimeException("Failed to begin travel (recurring coordinates)");
+                if (distance > 1)
+                    throw new RuntimeException("Failed to begin travel (found skipping tiles)");
+            }
+            HexTile hexRef = null;
+            try {
+                hexRef = hexRepository.getReferenceById(hexVec);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to begin travel (non-existent coordinates)");
+            }
+            PlaceBase place = hexRef.getPlace();
+            if (place != null && place.isBlocking())
+                throw new RuntimeException("Failed to begin travel (some tiles are blocked)");
+            hexRefPath.add(hexRef);
+            hexVecPrevious = hexVec;
+        }
+
         final TravelJobInfo travelJobInfo = TravelJobInfo.builder()
                 .partyId(party.getId())
                 .path(travelRequest.getPath())

@@ -2,26 +2,25 @@ package de.mfberg.bbak.controllers;
 
 import de.mfberg.bbak.dto.HexTileDTO;
 import de.mfberg.bbak.services.QuartzService;
-import de.mfberg.bbak.services.admin.AccountService;
-import de.mfberg.bbak.services.admin.WorldmapService;
+import de.mfberg.bbak.services.admin.AccountMgmtService;
+import de.mfberg.bbak.services.admin.WorldEditService;
 import lombok.RequiredArgsConstructor;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/admin")
 @RequiredArgsConstructor
 public class AdminController {
-    private final WorldmapService worldmapService;
+    private final WorldEditService worldEditService;
     private final QuartzService quartzService;
+    private final AccountMgmtService accountMgmtService;
 
     @GetMapping("/worldmap")
     public ResponseEntity<?> getWorldmap(
@@ -29,13 +28,13 @@ public class AdminController {
             @RequestParam(defaultValue = "0") Integer aroundAxialR,
             @RequestParam(defaultValue = "3") byte radius
     ) {
-            return ResponseEntity.ok(worldmapService.getHexTileDTOs(aroundAxialQ, aroundAxialR, radius));
+            return ResponseEntity.ok(worldEditService.getHexTileDTOs(aroundAxialQ, aroundAxialR, radius));
     }
 
     @PostMapping("/worldmap")
     public ResponseEntity<String> editWorldmap(@RequestBody List<HexTileDTO> worldGenData) {
         try {
-            worldmapService.editWorldmap(worldGenData);
+            worldEditService.editWorldmap(worldGenData);
             return ResponseEntity.ok("World edit successful.");
         } catch (Exception e) {
             e.printStackTrace();
@@ -44,11 +43,17 @@ public class AdminController {
     }
 
     @DeleteMapping("/account")
-    public ResponseEntity<String> deleteUserAccount() {
-        // todo: implement user account deletion endpoint
-        return ResponseEntity.ok("User account deletion successful.");
+    public ResponseEntity<String> deleteUserAccount(@RequestParam String userEmail) {
+        try {
+            accountMgmtService.deleteUser(userEmail);
+            return ResponseEntity.ok("User account deletion successful.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
     }
 
+    // todo: separate service
     @GetMapping("/jobs")
     public Map<String, String> getScheduledJobs() {
         Map<String, String> scheduledJobs = new HashMap<>();

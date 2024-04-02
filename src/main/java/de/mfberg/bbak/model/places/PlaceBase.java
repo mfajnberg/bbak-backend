@@ -14,4 +14,5 @@ public class PlaceBase {
     @Id
     @GeneratedValue
     private long id;
+    private boolean isBlocking = false;
 }

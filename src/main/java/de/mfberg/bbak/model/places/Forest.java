@@ -10,5 +10,5 @@ import lombok.ToString;
 @ToString
 @Entity
 public class Forest extends PlaceBase {
-
+    private boolean isBlocking = true;
 }

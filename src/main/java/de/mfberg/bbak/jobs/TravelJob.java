@@ -20,7 +20,6 @@ import java.util.List;
 @Component
 @Builder
 public class TravelJob implements Job {
-    private static final Logger LOG = LoggerFactory.getLogger(TravelService.class);
     private final TravelService travelService;
 
     @Override
@@ -32,17 +31,17 @@ public class TravelJob implements Job {
 
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
         TravelJobInfo jobInfo = (TravelJobInfo) dataMap.get("jobData");
+
         Party party = partyRepository.getReferenceById(jobInfo.getPartyId());
         List<HexVector> path = jobInfo.getPath();
 
-        HexTile newLocation = hexRepository.getReferenceById(
-                path.getFirst()
-        );
-        party.setLocation(newLocation);
-        path.removeFirst();
+        party.setLocation(hexRepository.getReferenceById(path.removeFirst()));
         if (!path.isEmpty()) {
+            party.setDestination(hexRepository.getReferenceById(path.getFirst()));
             jobInfo.setLabel(travelService.makeLabel(jobInfo));
             travelService.schedule(TravelJob.class, jobInfo);
+        } else {
+            party.setDestination(null);
         }
     }
 }

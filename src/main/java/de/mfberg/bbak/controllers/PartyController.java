@@ -6,16 +6,23 @@ import de.mfberg.bbak.services.parties.PartyService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/party")
 @RequiredArgsConstructor
 public class PartyController {
     private final PartyService service;
+
+    @GetMapping("/get")
+    public ResponseEntity<?> getParty(HttpServletRequest request) {
+        try {
+            return ResponseEntity.ok(service.getParty(request));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
 
     @PostMapping("/create")
     public ResponseEntity<String> createParty(HttpServletRequest request, @RequestBody PartyDTO partyData) {

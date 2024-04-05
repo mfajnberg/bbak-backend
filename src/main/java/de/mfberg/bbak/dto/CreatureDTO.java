@@ -1,5 +1,6 @@
 package de.mfberg.bbak.dto;
 
+import de.mfberg.bbak.model.creatures.CreatureBase;
 import de.mfberg.bbak.model.creatures.CreatureType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,4 +26,19 @@ public class CreatureDTO {
     private Long alignment;
     private Long temperament;
     private Long morale;
+
+    public CreatureDTO(CreatureBase creatureBase) {
+        this.creatureType = creatureBase.getCreatureType();
+        this.name = creatureBase.getName();
+        this.description = creatureBase.getDescription();
+        this.intellect = creatureBase.getIntellect();
+        this.discipline = creatureBase.getDiscipline();
+        this.power = creatureBase.getPower();
+        this.agility = creatureBase.getAgility();
+        this.lucidity = creatureBase.getLucidity();
+        this.charisma = creatureBase.getCharisma();
+        this.alignment = creatureBase.getAlignment();
+        this.temperament = creatureBase.getTemperament();
+        this.morale = creatureBase.getMorale();
+    }
 }

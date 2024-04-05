@@ -1,16 +1,15 @@
 package de.mfberg.bbak.model.places;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@Getter
-@Setter
-@ToString
+@Data
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Entity
-public class PlaceBase {
+public abstract class PlaceBase {
     @Id
     @GeneratedValue
     private long id;

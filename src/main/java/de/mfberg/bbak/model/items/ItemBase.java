@@ -1,18 +1,16 @@
 package de.mfberg.bbak.model.items;
 
 import de.mfberg.bbak.model.creatures.CreatureBase;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Entity
-public class ItemBase {
+public abstract class ItemBase {
     @Id
     @GeneratedValue
-    private Long id;
+    private long id;
     @ManyToOne
     private CreatureBase owner;
 }

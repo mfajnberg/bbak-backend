@@ -14,11 +14,7 @@ public class AvatarController {
     private final AvatarService service;
     @PostMapping("/create")
     public ResponseEntity<?> createAvatar(HttpServletRequest request, @RequestBody CreatureDTO newAvatar) {
-        try {
-            service.createAvatar(request, newAvatar);
-            return ResponseEntity.ok().body("Avatar creation successful.");
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
+        service.createAvatar(request, newAvatar);
+        return ResponseEntity.ok().body("Avatar creation successful.");
     }
 }

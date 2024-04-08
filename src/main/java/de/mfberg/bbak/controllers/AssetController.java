@@ -19,7 +19,6 @@ public class AssetController {
 
     @GetMapping("/get/{filename:.+}")
     public ResponseEntity<Resource> serveAsset(@PathVariable String filename) {
-        try {
             Resource resource = service.loadAsResource(filename);
             String contentType = service.getContentType(filename);
 
@@ -27,8 +26,5 @@ public class AssetController {
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
                     .contentType(MediaType.parseMediaType(contentType))
                     .body(resource);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
     }
 }

@@ -33,27 +33,17 @@ public class AdminController {
 
     @PostMapping("/worldmap")
     public ResponseEntity<String> editWorldmap(@RequestBody List<HexTileDTO> worldGenData) {
-        try {
             worldEditService.editWorldmap(worldGenData);
             return ResponseEntity.ok("World edit successful.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
     }
 
     @DeleteMapping("/account")
     public ResponseEntity<String> deleteUserAccount(@RequestParam String userEmail) {
-        try {
             accountMgmtService.deleteUser(userEmail);
             return ResponseEntity.ok("User account deletion successful.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
     }
 
-    // todo: separate service
+    // todo: factor all of this out into a wholly separate new service class
     @GetMapping("/jobs")
     public Map<String, String> getScheduledJobs() {
         Map<String, String> scheduledJobs = new HashMap<>();

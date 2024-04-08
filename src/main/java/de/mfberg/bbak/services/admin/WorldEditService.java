@@ -25,6 +25,7 @@ public class WorldEditService {
     @PersistenceContext
     private EntityManager entityManager;
 
+    // todo: check potential use in PartyService.beginTravel()
     public List<HexTile> getHexTiles(Integer aroundAxialQ, Integer aroundAxialR, byte radius) {
         Set<HexVector> vectors = HexVector.makeGrid(aroundAxialQ, aroundAxialR, radius);
         return hexRepository.findAllById(vectors);

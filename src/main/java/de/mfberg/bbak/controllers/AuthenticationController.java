@@ -22,9 +22,8 @@ public class AuthenticationController {
     private final AuthenticationService service;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(
-        @RequestBody RegisterRequest request
-    ) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        // todo: factor this check out into the authentication service
         if (service.isUserRegistered(request))
             return ResponseEntity.status(HttpStatus.CONFLICT).body("An account with this email already exists.");
 
@@ -32,20 +31,13 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(
-            @RequestBody AuthenticationRequest request
-    ) {
-        try {
+    public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(service.login(request));
-        } catch (UsernameNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+        // todo: try and replace this if/else stuff with the global exception handling mechanism
         AuthenticationResponse response = service.refreshToken(request);
         if (response != null)
             return ResponseEntity.ok(response);

@@ -1,6 +1,5 @@
 package de.mfberg.bbak;
 
-import de.mfberg.bbak.model.user.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -16,33 +16,18 @@ public class PartyController {
 
     @GetMapping("/get")
     public ResponseEntity<?> getParty(HttpServletRequest request) {
-        try {
-            return ResponseEntity.ok(service.getParty(request));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
+        return ResponseEntity.ok(service.getParty(request));
     }
 
     @PostMapping("/create")
     public ResponseEntity<String> createParty(HttpServletRequest request, @RequestBody PartyDTO partyData) {
-        try {
-            service.createParty(request, partyData);
-            return ResponseEntity.ok("Party creation successful.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
+        service.createParty(request, partyData);
+        return ResponseEntity.ok("Party creation successful.");
     }
 
     @PostMapping("/travel")
     public ResponseEntity<String> travel(HttpServletRequest request, @RequestBody TravelRequest travelRequest) {
-        try {
-            service.beginTravel(request, travelRequest);
-            return ResponseEntity.ok("Travel start successful.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
+        service.beginTravel(request, travelRequest);
+        return ResponseEntity.ok("Travel start successful.");
     }
 }

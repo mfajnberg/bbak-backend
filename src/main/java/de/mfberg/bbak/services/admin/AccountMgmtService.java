@@ -1,5 +1,6 @@
 package de.mfberg.bbak.services.admin;
 
+import de.mfberg.bbak.exceptions.ResourceNotFoundException;
 import de.mfberg.bbak.model.user.User;
 import de.mfberg.bbak.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,10 +12,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AccountMgmtService {
     private final UserRepository userRepository;
-    public void deleteUser(String userEmail) throws Exception {
+    public void deleteUser(String userEmail) {
         Optional<User> user = userRepository.findByEmail(userEmail);
         if (user.isEmpty())
-            throw new Exception("User not found.");
+            throw new ResourceNotFoundException("User not found.");
         userRepository.delete(user.get());
     }
 }

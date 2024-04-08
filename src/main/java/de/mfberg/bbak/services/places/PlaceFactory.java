@@ -1,5 +1,6 @@
 package de.mfberg.bbak.services.places;
 
+import de.mfberg.bbak.exceptions.InvalidDataException;
 import de.mfberg.bbak.model.places.Forest;
 import de.mfberg.bbak.model.places.PlaceBase;
 import de.mfberg.bbak.model.places.PlaceType;
@@ -10,7 +11,6 @@ public class PlaceFactory {
             case null -> null;
             case NONE -> null;
             case FOREST -> new Forest();
-            default -> throw new IllegalArgumentException("Unknown SiteType: " + placeType);
         };
     }
 }

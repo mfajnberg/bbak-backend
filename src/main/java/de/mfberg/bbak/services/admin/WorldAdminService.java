@@ -19,7 +19,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class WorldEditService {
+public class WorldAdminService {
     private final HexRepository hexRepository;
     private final PlaceRepository placeRepository;
     @PersistenceContext

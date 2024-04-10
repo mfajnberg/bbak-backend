@@ -29,6 +29,12 @@ public class GlobalExceptionHandler {
         return ex.getMessage();
     }
 
+    @ExceptionHandler(UserConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleUserConflictException(UserConflictException ex) {
+        return ex.getMessage();
+    }
+
     @ExceptionHandler(JobConflictException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleJobConflictException(JobConflictException ex) {
@@ -42,9 +48,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleUsernameNotFoundException(UsernameNotFoundException ex) {
         return ex.getMessage();
     }
-
 }

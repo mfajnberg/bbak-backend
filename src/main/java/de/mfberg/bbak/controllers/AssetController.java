@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AssetController {
     private final AssetService service;
 
-    @GetMapping("/get/{filename:.+}")
+    @GetMapping("/{filename:.+}")
     public ResponseEntity<Resource> serveAsset(@PathVariable String filename) {
             Resource resource = service.loadAsResource(filename);
             String contentType = service.getContentType(filename);

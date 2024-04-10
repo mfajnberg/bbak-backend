@@ -1,5 +1,6 @@
 package de.mfberg.bbak.services.authentication;
 
+import de.mfberg.bbak.exceptions.UserConflictException;
 import de.mfberg.bbak.model.user.*;
 import de.mfberg.bbak.dto.AuthenticationRequest;
 import de.mfberg.bbak.dto.AuthenticationResponse;
@@ -28,6 +29,9 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
+        if (isUserRegistered(request))
+            throw new UserConflictException("An account with this email already exists.");
+
         User user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -35,6 +39,7 @@ public class AuthenticationService {
                 .role(Role.ADMIN) // todo: change to Role.USER
                 .build();
         userRepository.save(user);
+
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(user, accessToken, TokenType.ACCESS);
@@ -52,8 +57,8 @@ public class AuthenticationService {
                         request.getPassword()
                 )
         );
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email"));
+        User user = userRepository.findByEmail(request.getEmail()).get(); // must be present due to the step above
+
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);

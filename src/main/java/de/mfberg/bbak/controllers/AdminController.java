@@ -2,8 +2,9 @@ package de.mfberg.bbak.controllers;
 
 import de.mfberg.bbak.dto.HexTileDTO;
 import de.mfberg.bbak.services.QuartzService;
-import de.mfberg.bbak.services.admin.AccountMgmtService;
-import de.mfberg.bbak.services.admin.WorldEditService;
+import de.mfberg.bbak.services.admin.AccountAdminService;
+import de.mfberg.bbak.services.admin.JobAdminService;
+import de.mfberg.bbak.services.admin.WorldAdminService;
 import lombok.RequiredArgsConstructor;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -18,51 +19,39 @@ import java.util.Map;
 @RequestMapping("api/admin")
 @RequiredArgsConstructor
 public class AdminController {
-    private final WorldEditService worldEditService;
+    private final WorldAdminService worldAdminService;
+    private final AccountAdminService accountAdminService;
     private final QuartzService quartzService;
-    private final AccountMgmtService accountMgmtService;
+    private final JobAdminService jobAdminService;
 
     @GetMapping("/worldmap")
-    public ResponseEntity<?> getWorldmap(
+    public ResponseEntity<List<HexTileDTO>> getWorldmap(
             @RequestParam(defaultValue = "0") Integer aroundAxialQ,
             @RequestParam(defaultValue = "0") Integer aroundAxialR,
             @RequestParam(defaultValue = "3") byte radius
     ) {
-            return ResponseEntity.ok(worldEditService.getHexTileDTOs(aroundAxialQ, aroundAxialR, radius));
+            List<HexTileDTO> worldMap = worldAdminService.getHexTileDTOs(aroundAxialQ, aroundAxialR, radius);
+            return ResponseEntity.ok(worldMap);
     }
 
     @PostMapping("/worldmap")
     public ResponseEntity<String> editWorldmap(@RequestBody List<HexTileDTO> worldGenData) {
-            worldEditService.editWorldmap(worldGenData);
+            worldAdminService.editWorldmap(worldGenData);
             return ResponseEntity.ok("World edit successful.");
     }
 
-    @DeleteMapping("/account")
-    public ResponseEntity<String> deleteUserAccount(@RequestParam String userEmail) {
-            accountMgmtService.deleteUser(userEmail);
+    @DeleteMapping("/account/{userEmail:.+}")
+    public ResponseEntity<String> deleteAccount(@PathVariable String userEmail) {
+            accountAdminService.deleteAccount(userEmail);
             return ResponseEntity.ok("User account deletion successful.");
     }
 
-    // todo: factor all of this out into a wholly separate new service class
     @GetMapping("/jobs")
-    public Map<String, String> getScheduledJobs() {
-        Map<String, String> scheduledJobs = new HashMap<>();
-        Scheduler scheduler = quartzService.getScheduler();
+    public ResponseEntity<?> getScheduledJobs() {
         try {
-            for (String groupName : scheduler.getJobGroupNames()) {
-                for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
-                    List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);
-                    for (Trigger trigger : triggers) {
-                        if (trigger.getNextFireTime() != null) {
-                            scheduledJobs.put(jobKey.toString(), trigger.getNextFireTime().toString());
-                        }
-                    }
-                }
-            }
+            return ResponseEntity.ok(jobAdminService.getScheduledJobs());
         } catch (SchedulerException e) {
-            e.printStackTrace();
-            return Map.of("Fehler", "Fehler beim Abrufen der geplanten Jobs.");
+            return ResponseEntity.status(500).body("Error: Couldn't fetch jobs from quartz service.");
         }
-        return scheduledJobs;
     }
 }

@@ -1,6 +1,6 @@
 package de.mfberg.bbak;
 
-import de.mfberg.bbak.services.authentication.JwtService;
+import de.mfberg.bbak.services.common.JwtService;
 import de.mfberg.bbak.repo.TokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

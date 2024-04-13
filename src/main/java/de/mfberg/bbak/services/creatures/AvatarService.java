@@ -1,33 +1,25 @@
 package de.mfberg.bbak.services.creatures;
 
 import de.mfberg.bbak.dto.CreatureDTO;
-import de.mfberg.bbak.exceptions.ResourceNotFoundException;
 import de.mfberg.bbak.model.creatures.Avatar;
 import de.mfberg.bbak.model.user.User;
 import de.mfberg.bbak.repo.CreatureRepository;
-import de.mfberg.bbak.repo.UserRepository;
-import de.mfberg.bbak.services.authentication.JwtService;
+import de.mfberg.bbak.services.common.ExtractionService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class AvatarService {
     private final CreatureRepository creatureRepository;
-    private final UserRepository userRepository;
-    private final JwtService jwtService;
+    private final ExtractionService extractionService;
 
     public void createAvatar(HttpServletRequest request, CreatureDTO newAvatarData) {
-        String jwt = request.getHeader("Authorization").substring(7);
-        String username = jwtService.extractUsername(jwt);
-        Optional<User> user = userRepository.findByEmail(username);
-        if (user.isEmpty())
-            throw new ResourceNotFoundException("Error retrieving user from claim.");
-        Avatar avatar = (Avatar) new CreatureFactory().fromDTO(newAvatarData); // fromDTO throws an invalid data ex.
-        avatar.setOwner(user.get());
+        // todo: Prüfung der Charakterwerte im DTO bezüglich Einhaltung von Spielregeln
+        Avatar avatar = (Avatar) new CreatureFactory().fromDTO(newAvatarData);
+        User user = extractionService.userFromClaim(request);
+        avatar.setOwner(user);
         creatureRepository.save(avatar);
     }
 }

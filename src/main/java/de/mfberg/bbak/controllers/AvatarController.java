@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AvatarController {
     private final AvatarService service;
+
     @PostMapping("/create")
     public ResponseEntity<String> createAvatar(HttpServletRequest request, @RequestBody CreatureDTO newAvatar) {
         service.createAvatar(request, newAvatar);

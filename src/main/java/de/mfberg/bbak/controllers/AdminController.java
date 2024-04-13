@@ -1,19 +1,15 @@
 package de.mfberg.bbak.controllers;
 
 import de.mfberg.bbak.dto.HexTileDTO;
-import de.mfberg.bbak.services.QuartzService;
 import de.mfberg.bbak.services.admin.AccountAdminService;
 import de.mfberg.bbak.services.admin.JobAdminService;
 import de.mfberg.bbak.services.admin.WorldAdminService;
 import lombok.RequiredArgsConstructor;
 import org.quartz.*;
-import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("api/admin")
@@ -21,7 +17,6 @@ import java.util.Map;
 public class AdminController {
     private final WorldAdminService worldAdminService;
     private final AccountAdminService accountAdminService;
-    private final QuartzService quartzService;
     private final JobAdminService jobAdminService;
 
     @GetMapping("/worldmap")

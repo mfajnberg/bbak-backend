@@ -1,4 +1,4 @@
-package de.mfberg.bbak.services.authentication;
+package de.mfberg.bbak.services.common;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

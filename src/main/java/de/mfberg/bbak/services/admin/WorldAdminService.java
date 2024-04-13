@@ -25,12 +25,6 @@ public class WorldAdminService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    // todo: check potential use in PartyService.beginTravel()
-    public List<HexTile> getHexTiles(Integer aroundAxialQ, Integer aroundAxialR, byte radius) {
-        Set<HexVector> vectors = HexVector.makeGrid(aroundAxialQ, aroundAxialR, radius);
-        return hexRepository.findAllById(vectors);
-    }
-
     public List<HexTileDTO> getHexTileDTOs(Integer aroundAxialQ, Integer aroundAxialR, byte radius) {
         Set<HexVector> vectors = HexVector.makeGrid(aroundAxialQ, aroundAxialR, radius);
         List<HexTileDTO> result = new ArrayList<HexTileDTO>();

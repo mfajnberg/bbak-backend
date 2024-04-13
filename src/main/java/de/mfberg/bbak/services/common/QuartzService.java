@@ -1,4 +1,4 @@
-package de.mfberg.bbak.services;
+package de.mfberg.bbak.services.common;
 
 import de.mfberg.bbak.jobs.TravelJobInfo;
 import jakarta.annotation.PostConstruct;

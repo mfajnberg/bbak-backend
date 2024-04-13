@@ -1,6 +1,6 @@
 package de.mfberg.bbak.services.admin;
 
-import de.mfberg.bbak.services.QuartzService;
+import de.mfberg.bbak.services.common.QuartzService;
 import lombok.RequiredArgsConstructor;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;

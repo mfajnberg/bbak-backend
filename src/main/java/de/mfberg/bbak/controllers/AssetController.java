@@ -21,7 +21,6 @@ public class AssetController {
     public ResponseEntity<Resource> serveAsset(@PathVariable String filename) {
             Resource resource = service.loadAsResource(filename);
             String contentType = service.getContentType(filename);
-
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
                     .contentType(MediaType.parseMediaType(contentType))

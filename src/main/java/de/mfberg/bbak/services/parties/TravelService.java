@@ -2,7 +2,7 @@ package de.mfberg.bbak.services.parties;
 
 import de.mfberg.bbak.exceptions.JobSchedulingException;
 import de.mfberg.bbak.jobs.TravelJobInfo;
-import de.mfberg.bbak.services.QuartzService;
+import de.mfberg.bbak.services.common.QuartzService;
 import lombok.AllArgsConstructor;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;

@@ -16,4 +16,6 @@ public class Avatar extends CreatureBase {
     @Enumerated(EnumType.STRING)
     private final CreatureType creatureType = CreatureType.AVATAR;
     private boolean isPartyLeader = true;
+
+
 }

@@ -7,12 +7,12 @@ import de.mfberg.bbak.dto.AuthenticationResponse;
 import de.mfberg.bbak.dto.RegisterRequest;
 import de.mfberg.bbak.repo.TokenRepository;
 import de.mfberg.bbak.repo.UserRepository;
+import de.mfberg.bbak.services.common.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

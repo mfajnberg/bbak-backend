@@ -5,20 +5,17 @@ import de.mfberg.bbak.dto.PartyDTO;
 import de.mfberg.bbak.dto.TravelRequest;
 import de.mfberg.bbak.exceptions.JobConflictException;
 import de.mfberg.bbak.exceptions.InvalidDataException;
-import de.mfberg.bbak.exceptions.ResourceNotFoundException;
 import de.mfberg.bbak.model.creatures.Avatar;
 import de.mfberg.bbak.model.creatures.CreatureBase;
 import de.mfberg.bbak.model.parties.Party;
 import de.mfberg.bbak.model.places.PlaceBase;
-import de.mfberg.bbak.model.user.User;
 import de.mfberg.bbak.model.worldmap.HexTile;
 import de.mfberg.bbak.model.worldmap.HexVector;
 import de.mfberg.bbak.repo.CreatureRepository;
 import de.mfberg.bbak.repo.HexRepository;
 import de.mfberg.bbak.repo.PartyRepository;
-import de.mfberg.bbak.repo.UserRepository;
-import de.mfberg.bbak.services.QuartzService;
-import de.mfberg.bbak.services.authentication.JwtService;
+import de.mfberg.bbak.services.common.QuartzService;
+import de.mfberg.bbak.services.common.ExtractionService;
 import de.mfberg.bbak.services.creatures.CreatureFactory;
 import de.mfberg.bbak.jobs.TravelJob;
 import de.mfberg.bbak.jobs.TravelJobInfo;
@@ -34,18 +31,17 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class PartyService {
-    private final UserRepository userRepository;
     private final CreatureRepository creatureRepository;
     private final PartyRepository partyRepository;
     private final HexRepository hexRepository;
-    private final JwtService jwtService;
+    private final ExtractionService extractionService;
     private final TravelService travelService;
     private final QuartzService quartzService;
 
     @Transactional
     public PartyDTO getParty(HttpServletRequest request) {
         Party party;
-        party = extractPartyFromClaim(request);
+        party = extractionService.partyFromClaim(request);
 
 
         PartyDTO partyDTO = new PartyDTO();
@@ -80,7 +76,7 @@ public class PartyService {
 
     @Transactional
     public void beginTravel(HttpServletRequest request, TravelRequest travelRequest) {
-        Party party = extractPartyFromClaim(request);
+        Party party = extractionService.partyFromClaim(request);
 
         Set<JobKey> jobKeys = new HashSet<>();
         try {
@@ -130,7 +126,7 @@ public class PartyService {
     }
 
     public void createParty(HttpServletRequest request, PartyDTO partyData) {
-        Avatar leader = extractAvatarFromClaim(request);
+        Avatar leader = extractionService.avatarFromClaim(request);
         Party newParty = new Party();
         newParty.setLeader(leader);
         newParty.setLocation(hexRepository.getReferenceById(new HexVector(0, 0)));
@@ -143,36 +139,5 @@ public class PartyService {
         });
     }
 
-    private Avatar extractAvatarFromClaim(HttpServletRequest request) {
-        String jwt = request.getHeader("Authorization").substring(7);
-        String username = jwtService.extractUsername(jwt);
-        Optional<User> user = userRepository.findByEmail(username);
-        if (user.isEmpty())
-            throw new ResourceNotFoundException("Error retrieving user from claim.");
-
-        Optional<Avatar> leader = creatureRepository.findAvatarByOwner(user.get());
-        if (leader.isEmpty())
-            throw new ResourceNotFoundException("Error retrieving leader from claim.");
-
-        return leader.get();
-    }
-
-    private Party extractPartyFromClaim(HttpServletRequest request) {
-        String jwt = request.getHeader("Authorization").substring(7);
-        String username = jwtService.extractUsername(jwt);
-        Optional<User> user = userRepository.findByEmail(username);
-        if (user.isEmpty())
-            throw new ResourceNotFoundException("Error retrieving user from claim.");
-
-        Optional<Avatar> leader = creatureRepository.findAvatarByOwner(user.get());
-        if (leader.isEmpty())
-            throw new ResourceNotFoundException("Error retrieving leader from claim.");
-
-        Optional<Party> party = partyRepository.findPartyByLeader(leader.get());
-        if (party.isEmpty())
-            throw new ResourceNotFoundException("Error retrieving party from claim.");
-
-        return party.get();
-    }
 
 }

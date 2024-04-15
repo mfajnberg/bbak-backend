@@ -35,18 +35,13 @@ public class PartyService {
     private final PartyRepository partyRepository;
     private final HexRepository hexRepository;
     private final ExtractionService extractionService;
-    private final TravelService travelService;
     private final QuartzService quartzService;
 
     @Transactional
     public PartyDTO getParty(HttpServletRequest request) {
-        Party party;
-        party = extractionService.partyFromClaim(request);
-
-
+        Party party = extractionService.partyFromClaim(request);
         PartyDTO partyDTO = new PartyDTO();
         partyDTO.setLeader(new CreatureDTO(party.getLeader()));
-
         List<CreatureBase> members;
         members = creatureRepository.findAllPartyMembers(party.getId());
         partyDTO.setMembers(new ArrayList<>());
@@ -56,7 +51,7 @@ public class PartyService {
 
         try {
             for (JobKey jobKey : quartzService.getScheduler().getJobKeys(GroupMatcher.anyGroup())) {
-                if (jobKey.getName().contains(party.getId() + "=")) {
+                if (jobKey.getName().contains(party.getId() + "~")) {
                     Scheduler scheduler = quartzService.getScheduler();
                     Trigger trigger = scheduler.getTriggersOfJob(jobKey).getFirst();
 
@@ -66,7 +61,7 @@ public class PartyService {
                             party.getDestination().getAxial().getQ() - party.getLocation().getAxial().getQ(),
                             party.getDestination().getAxial().getR() - party.getLocation().getAxial().getR()
                     ));
-                    break; // todo: other job types
+                    break; // todo: inform of other job types as well
                 }
             }
         } catch (Exception ignored) { }
@@ -74,56 +69,6 @@ public class PartyService {
         return partyDTO;
     }
 
-    @Transactional
-    public void beginTravel(HttpServletRequest request, TravelRequest travelRequest) {
-        Party party = extractionService.partyFromClaim(request);
-
-        Set<JobKey> jobKeys = new HashSet<>();
-        try {
-            jobKeys = quartzService.getScheduler().getJobKeys(GroupMatcher.anyGroup());
-        } catch (Exception ignored) { }
-        for (JobKey jobKey : jobKeys) {
-            if (jobKey.getName().contains(party.getId() + "=")) {
-                throw new JobConflictException("Failed to begin travel (party already travelling)");
-            }
-        }
-
-        HexVector hexVecPrevious = null;
-        List<HexTile> hexRefPath = new ArrayList<>();
-        for (HexVector hexVec : travelRequest.getPath()) {
-            hexVec.setQ(hexVec.getQ() + party.getLocation().getAxial().getQ());
-            hexVec.setR(hexVec.getR() + party.getLocation().getAxial().getR());
-            if (hexVecPrevious != null) {
-                long distance = HexVector.axialDistance(hexVecPrevious, hexVec);
-                if (distance == 0)
-                    throw new InvalidDataException("Failed to begin travel (recurring coordinates)");
-                if (distance > 1)
-                    throw new InvalidDataException("Failed to begin travel (found skipping tiles)");
-            }
-            HexTile hexRef = null;
-            try {
-                hexRef = hexRepository.getReferenceById(hexVec);
-            } catch (Exception e) {
-                throw new InvalidDataException("Failed to begin travel (non-existent coordinates)");
-            }
-            if (hexRef == party.getLocation())
-                throw new InvalidDataException("Failed to begin travel (walking in circles)");
-            PlaceBase place = hexRef.getPlace();
-            if (place != null && place.isBlocking())
-                throw new InvalidDataException("Failed to begin travel (some tiles are blocked)");
-            hexRefPath.add(hexRef);
-            hexVecPrevious = hexVec;
-        }
-
-        final TravelJobInfo travelJobInfo = TravelJobInfo.builder()
-                .partyId(party.getId())
-                .path(travelRequest.getPath())
-                .durationMillis(500000)
-                .build();
-        travelJobInfo.setLabel(travelService.makeLabel(travelJobInfo));
-        travelService.schedule(TravelJob.class, travelJobInfo);
-        party.setDestination(hexRefPath.getFirst());
-    }
 
     public void createParty(HttpServletRequest request, PartyDTO partyData) {
         Avatar leader = extractionService.avatarFromClaim(request);

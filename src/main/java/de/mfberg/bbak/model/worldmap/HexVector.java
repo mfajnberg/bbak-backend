@@ -28,7 +28,7 @@ public class HexVector implements Serializable {
                 + Math.abs(a.r - b.r)) / 2;
     }
 
-    public static Set<HexVector> makeGrid(Integer aroundAxialQ, Integer aroundAxialR, byte radius) {
+    public static Set<HexVector> makeGrid(long aroundAxialQ, long aroundAxialR, byte radius) {
         Set<HexVector> result = new HashSet<HexVector>();
         result.add(new HexVector(0, 0));
         for (int currentRing = 1; currentRing <= radius; currentRing++)

@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class Pawn extends CreatureBase {
     @Enumerated(EnumType.STRING)
     private final CreatureType creatureType = CreatureType.PAWN;
+    private boolean isPartyLeader = false;
 }

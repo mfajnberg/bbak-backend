@@ -17,5 +17,5 @@ public class HexTile {
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "place_id")
-    private PlaceBase place;
+    private PlaceBase place; // todo: map through PlaceBase ( [0..n]-relationship )
 }

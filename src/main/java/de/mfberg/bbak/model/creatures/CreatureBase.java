@@ -33,6 +33,8 @@ public abstract class CreatureBase {
 
     @ManyToOne
     private Party party;
+    private boolean isPartyLeader;
+
     @OneToMany(mappedBy = "owner")
     private List<ItemBase> backpack;
 }

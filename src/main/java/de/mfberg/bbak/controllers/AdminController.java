@@ -21,8 +21,8 @@ public class AdminController {
 
     @GetMapping("/worldmap")
     public ResponseEntity<List<HexTileDTO>> getWorldmap(
-            @RequestParam(defaultValue = "0") Integer aroundAxialQ,
-            @RequestParam(defaultValue = "0") Integer aroundAxialR,
+            @RequestParam(defaultValue = "0") long aroundAxialQ,
+            @RequestParam(defaultValue = "0") long aroundAxialR,
             @RequestParam(defaultValue = "3") byte radius
     ) {
             List<HexTileDTO> worldMap = worldAdminService.getHexTileDTOs(aroundAxialQ, aroundAxialR, radius);

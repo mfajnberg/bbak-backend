@@ -1,6 +1,7 @@
 package de.mfberg.bbak.services.parties;
 
 import de.mfberg.bbak.dto.CreatureDTO;
+import de.mfberg.bbak.dto.HexTileDTO;
 import de.mfberg.bbak.dto.PartyDTO;
 import de.mfberg.bbak.dto.TravelRequest;
 import de.mfberg.bbak.exceptions.JobConflictException;
@@ -9,11 +10,13 @@ import de.mfberg.bbak.model.creatures.Avatar;
 import de.mfberg.bbak.model.creatures.CreatureBase;
 import de.mfberg.bbak.model.parties.Party;
 import de.mfberg.bbak.model.places.PlaceBase;
+import de.mfberg.bbak.model.places.PlaceType;
 import de.mfberg.bbak.model.worldmap.HexTile;
 import de.mfberg.bbak.model.worldmap.HexVector;
 import de.mfberg.bbak.repo.CreatureRepository;
 import de.mfberg.bbak.repo.HexRepository;
 import de.mfberg.bbak.repo.PartyRepository;
+import de.mfberg.bbak.repo.PlaceRepository;
 import de.mfberg.bbak.services.common.QuartzService;
 import de.mfberg.bbak.services.common.ExtractionService;
 import de.mfberg.bbak.services.creatures.CreatureFactory;
@@ -36,6 +39,7 @@ public class PartyService {
     private final HexRepository hexRepository;
     private final ExtractionService extractionService;
     private final QuartzService quartzService;
+    private final PlaceRepository placeRepository;
 
     @Transactional
     public PartyDTO getParty(HttpServletRequest request) {
@@ -66,6 +70,20 @@ public class PartyService {
             }
         } catch (Exception ignored) { }
 
+        long partyQ = party.getLocation().getAxial().getQ();
+        long partyR = party.getLocation().getAxial().getR();
+        Set<HexVector> vectors = HexVector.makeGrid(partyQ, partyR, (byte) 5);
+        List<HexTileDTO> hexTileDTOs = new ArrayList<>();
+        vectors.forEach(axial -> {
+            HexVector axialRelative = new HexVector(axial.getQ() - partyQ, axial.getR() - partyR);
+            HexTileDTO hexDTO = new HexTileDTO(axialRelative, null);
+            Optional<PlaceBase> place = placeRepository.findPlaceByHexVector(axial.getQ(), axial.getR());
+            place.ifPresent(existingPlace -> {
+                hexDTO.setPlaceType(PlaceType.fromPlaceBase(existingPlace));
+            });
+            hexTileDTOs.add(hexDTO);
+        });
+        partyDTO.setVision(hexTileDTOs);
         return partyDTO;
     }
 

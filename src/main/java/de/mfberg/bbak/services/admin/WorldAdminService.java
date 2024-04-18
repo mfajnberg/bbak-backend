@@ -1,7 +1,6 @@
 package de.mfberg.bbak.services.admin;
 
 import de.mfberg.bbak.dto.HexTileDTO;
-import de.mfberg.bbak.model.places.Forest;
 import de.mfberg.bbak.model.places.PlaceBase;
 import de.mfberg.bbak.model.places.PlaceType;
 import de.mfberg.bbak.repo.HexRepository;
@@ -25,14 +24,14 @@ public class WorldAdminService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public List<HexTileDTO> getHexTileDTOs(Integer aroundAxialQ, Integer aroundAxialR, byte radius) {
+    public List<HexTileDTO> getHexTileDTOs(long aroundAxialQ, long aroundAxialR, byte radius) {
         Set<HexVector> vectors = HexVector.makeGrid(aroundAxialQ, aroundAxialR, radius);
         List<HexTileDTO> result = new ArrayList<HexTileDTO>();
         vectors.forEach(axial -> {
             HexTileDTO hexDTO = new HexTileDTO(axial, null);
             Optional<PlaceBase> place = placeRepository.findPlaceByHexVector(axial.getQ(), axial.getR());
             place.ifPresent(existingPlace -> {
-                hexDTO.setPlaceType(determinePlaceType(existingPlace));
+                hexDTO.setPlaceType(PlaceType.fromPlaceBase(existingPlace));
             });
             result.add(hexDTO);
         });
@@ -69,12 +68,5 @@ public class WorldAdminService {
                 }
             });
         });
-    }
-
-    private PlaceType determinePlaceType(PlaceBase place) {
-        if (place instanceof Forest) return PlaceType.FOREST;
-        // else if (place instanceof SUBCLASS) return PlaceType.TYPE;
-        // ...
-        else return PlaceType.NONE;
     }
 }

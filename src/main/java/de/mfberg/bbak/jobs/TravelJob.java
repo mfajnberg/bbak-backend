@@ -18,13 +18,15 @@ import java.util.List;
 @Builder
 public class TravelJob implements Job {
     private final TravelService travelService;
+    private final PartyRepository partyRepository;
+    private final HexRepository hexRepository;
 
     @Override
     @Transactional
     public void execute(JobExecutionContext context) throws JobExecutionException {
         ApplicationContext applicationContext = ApplicationContextProvider.getApplicationContext();
-        PartyRepository partyRepository = applicationContext.getBean(PartyRepository.class);
-        HexRepository hexRepository = applicationContext.getBean(HexRepository.class);
+//        PartyRepository partyRepository = applicationContext.getBean(PartyRepository.class);
+//        HexRepository hexRepository = applicationContext.getBean(HexRepository.class);
 
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
         TravelJobInfo jobInfo = (TravelJobInfo) dataMap.get("jobData");

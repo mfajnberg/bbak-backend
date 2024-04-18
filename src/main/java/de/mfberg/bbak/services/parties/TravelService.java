@@ -23,9 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -44,7 +42,7 @@ public class TravelService {
         final TravelJobInfo travelJobInfo = TravelJobInfo.builder()
                 .partyId(party.getId())
                 .path(travelRequest.getPath())
-                .durationMillis(500000)
+                .durationMillis(5000)
                 .build();
 
         travelJobInfo.setLabel(makeTravelJobLabel(travelJobInfo));
@@ -83,7 +81,7 @@ public class TravelService {
                 if (distance > 1)
                     throw new InvalidDataException("Failed to begin travel (found skipping tiles)");
             }
-            HexTile hexRef = null;
+            HexTile hexRef;
             try {
                 hexRef = hexRepository.getReferenceById(hexVec);
             } catch (Exception probablyAnEntityNotFoundException) {

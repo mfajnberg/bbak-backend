@@ -16,7 +16,7 @@ public class PartyController {
     private final PartyService partyService;
     private final TravelService travelService;
 
-    @GetMapping("/get")
+    @GetMapping("")
     public ResponseEntity<PartyDTO> getParty(HttpServletRequest request) {
         return ResponseEntity.ok(partyService.getParty(request));
     }

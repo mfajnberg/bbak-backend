@@ -18,19 +18,19 @@ import java.util.Map;
 public class JobAdminService {
     private final QuartzService quartzService;
     public Map<String, String> getScheduledJobs() throws SchedulerException {
-        Map<String, String> scheduledJobs = new HashMap<>();
+        Map<String, String> monitoredJobs = new HashMap<>();
         Scheduler scheduler = quartzService.getScheduler();
         for (String groupName : scheduler.getJobGroupNames()) {
             for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
                 List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);
                 for (Trigger trigger : triggers) {
                     if (trigger.getNextFireTime() != null) {
-                        scheduledJobs.put(jobKey.toString(), trigger.getNextFireTime().toString());
+                        monitoredJobs.put(jobKey.toString(), trigger.getNextFireTime().toString());
                         // todo: add more info about the job (do account for different job groups)
                     }
                 }
             }
         }
-        return scheduledJobs;
+        return monitoredJobs;
     }
 }

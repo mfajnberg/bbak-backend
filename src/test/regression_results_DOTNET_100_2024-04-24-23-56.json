@@ -1,0 +1,10 @@
+DOTNET, last measurement: {
+    "Slope": 0.7845313943231652,
+    "Intercept": 0.04695251678369705,
+    "R-squared": 0.9307986090671025,
+    "p-values": 1.21925726748111e-58,
+    "Confidence Intervals": [
+        0.7416498103275436,
+        0.8274129783187868
+    ]
+}

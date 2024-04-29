@@ -1,5 +1,6 @@
 package de.mfberg.bbak.services.authentication;
 
+import de.mfberg.bbak.exceptions.ResourceNotFoundException;
 import de.mfberg.bbak.exceptions.UserConflictException;
 import de.mfberg.bbak.model.user.*;
 import de.mfberg.bbak.dto.AuthenticationRequest;
@@ -58,7 +59,6 @@ public class AuthenticationService {
                 )
         );
         User user = userRepository.findByEmail(request.getEmail()).get(); // must be present due to the step above
-
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
@@ -68,6 +68,38 @@ public class AuthenticationService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    public AuthenticationResponse refreshToken(HttpServletRequest request) {
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authHeader == null || !authHeader.startsWith("Bearer "))
+            return null;
+        final String refreshToken = authHeader.substring(7);
+        final String userEmail = jwtService.extractUsername(refreshToken);
+        if (userEmail != null) {
+            User user = userRepository.findByEmail(userEmail).orElseThrow();
+            boolean isAvailableInDB = tokenRepository.findByToken(refreshToken)
+                    .map (t ->
+                            (t.getTokenType() == TokenType.REFRESH) &&
+                                    !t.isExpired() &&
+                                    !t.isRevoked()
+                    )
+                    .orElse(false);
+            if (jwtService.isTokenValid(refreshToken, user) && isAvailableInDB) {
+                // the part that matters:
+                String accessToken = jwtService.generateAccessToken(user);
+                revokeAllUserTokens(user);
+                saveUserToken(user, accessToken, TokenType.ACCESS);
+                saveUserToken(user, refreshToken, TokenType.REFRESH);
+                return AuthenticationResponse.builder()
+                        .accessToken(accessToken)
+                        .refreshToken(refreshToken)
+                        .build();
+            } else {
+                revokeAllUserTokens(user);
+            }
+        }
+        return null;
     }
 
     private void revokeAllUserTokens(User user) {
@@ -90,44 +122,6 @@ public class AuthenticationService {
                 .revoked(false)
                 .build();
         tokenRepository.save(token);
-    }
-
-    public AuthenticationResponse refreshToken(
-            HttpServletRequest request
-    ) {
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        final String refreshToken;
-        final String userEmail;
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return null;
-        }
-        refreshToken = authHeader.substring(7);
-        userEmail = jwtService.extractUsername(refreshToken);
-        if (userEmail != null) {
-            User user = userRepository.findByEmail(userEmail)
-                    .orElseThrow();
-            boolean isAvailableInDB = tokenRepository.findByToken(refreshToken)
-                    .map (t ->
-                            (t.getTokenType() == TokenType.REFRESH) &&
-                            !t.isExpired() &&
-                            !t.isRevoked()
-                    )
-                    .orElse(false);
-            if (jwtService.isTokenValid(refreshToken, user) && isAvailableInDB) {
-                String accessToken = jwtService.generateAccessToken(user);
-                revokeAllUserTokens(user);
-                saveUserToken(user, accessToken, TokenType.ACCESS);
-                saveUserToken(user, refreshToken, TokenType.REFRESH);
-                return AuthenticationResponse.builder()
-                        .accessToken(accessToken)
-                        .refreshToken(refreshToken)
-                        .build();
-            }
-            else {
-                revokeAllUserTokens(user);
-            }
-        }
-        return null;
     }
 
     public boolean isUserRegistered(RegisterRequest request) {

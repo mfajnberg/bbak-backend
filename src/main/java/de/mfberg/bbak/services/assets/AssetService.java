@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 
 @Service
 public class AssetService {
-    private final Path assetsLocation = Paths.get("src/main/resources/streamed");
+    private final Path assetsLocation = Paths.get("resources/streamed");
 
     public Resource loadAsResource(String filename) {
         try {

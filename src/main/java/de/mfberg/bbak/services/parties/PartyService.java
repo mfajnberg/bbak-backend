@@ -69,6 +69,11 @@ public class PartyService {
                 }
             }
         } catch (Exception ignored) { }
+        return partyDTO;
+    }
+
+    public List<HexTileDTO> getVision(HttpServletRequest request) {
+        Party party = extractionService.partyFromClaim(request);
 
         long partyQ = party.getLocation().getAxial().getQ();
         long partyR = party.getLocation().getAxial().getR();
@@ -83,10 +88,8 @@ public class PartyService {
             });
             hexTileDTOs.add(hexDTO);
         });
-        partyDTO.setVision(hexTileDTOs);
-        return partyDTO;
+        return hexTileDTOs;
     }
-
 
     public void createParty(HttpServletRequest request, PartyDTO partyData) {
         Avatar leader = extractionService.avatarFromClaim(request);
@@ -101,6 +104,4 @@ public class PartyService {
             creatureRepository.save(newMember);
         });
     }
-
-
 }

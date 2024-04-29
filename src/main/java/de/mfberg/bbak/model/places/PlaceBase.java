@@ -14,4 +14,5 @@ public abstract class PlaceBase {
     @GeneratedValue
     private long id;
     private final boolean isBlocking = false;
+    // todo: reference a HexTile!!! (not the other way around)
 }

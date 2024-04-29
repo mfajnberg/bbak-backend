@@ -1,0 +1,10 @@
+SPRING, last measurement {
+    "Slope": 6.358890871908619,
+    "Intercept": 49.62253933598414,
+    "R-squared": 0.998942503503319,
+    "p-values": 1.244836268452689e-147,
+    "Confidence Intervals": [
+        6.317416335770477,
+        6.400365408046761
+    ]
+}

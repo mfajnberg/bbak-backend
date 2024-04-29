@@ -1,0 +1,10 @@
+SPRING, first measurement: {
+    "Slope": 5.276312685689131,
+    "Intercept": 78.10402997724412,
+    "R-squared": 0.9716146546670525,
+    "p-values": 1.2970605778653959e-77,
+    "Confidence Intervals": [
+        5.095528044908994,
+        5.457097326469269
+    ]
+}
